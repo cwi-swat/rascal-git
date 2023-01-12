@@ -6,9 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
@@ -83,5 +88,20 @@ public class RascalGit {
             }    
         }
 	}
+
+    public void switchToTag(ISourceLocation loc, IString tag) {
+        if (repoMap.containsKey(loc)) {
+            File repoDir = new File(loc.getPath());
+            try {
+                Git git = Git.open(repoDir);
+                String repoTag = Constants.R_TAGS + tag.getValue();
+                git.checkout().setName(repoTag).call();
+            } catch (GitAPIException ge) {
+                throw RuntimeExceptionFactory.javaException(ge, null, null);
+            } catch (IOException ioe) {
+                throw RuntimeExceptionFactory.javaException(ioe, null, null);
+            }    
+        }
+    }
 	
 }
