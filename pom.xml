@@ -4,8 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>edu.appstate.cs</groupId>
-  <artifactId>RascalGit</artifactId>
+  <artifactId>rascal-git</artifactId>
   <version>0.1.0</version>
+  <packaging>jar</packaging>
+
+  <scm>
+    <developerConnection>scm:git:https://github.com/PLSE-Lab/RascalGit.git</developerConnection>			
+    <tag>HEAD</tag>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,7 +35,7 @@
     <dependency>
       <groupId>org.rascalmpl</groupId>
       <artifactId>rascal</artifactId>
-      <version>0.23.2</version>
+      <version>0.28.3</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jgit</groupId>
@@ -52,9 +58,10 @@
       <plugin>
         <groupId>org.rascalmpl</groupId>
         <artifactId>rascal-maven-plugin</artifactId>
-        <version>0.8.2</version>
+        <version>0.15.1</version>
         <configuration>
           <errorsAsWarnings>true</errorsAsWarnings>
+          <enableStandardLibrary>false</enableStandardLibrary>
           <bin>${project.build.outputDirectory}</bin>
           <srcs>
             <src>${project.basedir}/src/main/rascal</src>

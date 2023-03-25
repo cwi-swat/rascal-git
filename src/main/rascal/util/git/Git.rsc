@@ -1,4 +1,4 @@
-module RascalGit
+module util::git::Git
 
 @javaClass{edu.appstate.cs.rascalgit.RascalGit}
 public java void cloneRemoteRepository(str remotePath, loc localPath);

@@ -1,4 +1,5 @@
-Project-Name: RascalGit
+Project-Name: rascal-git
 Source: src/main/rascal
 Require-Libraries: 
     
+
