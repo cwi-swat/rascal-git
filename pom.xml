@@ -8,7 +8,7 @@
   <packaging>jar</packaging>
 
   <scm>
-    <developerConnection>scm:git:https://github.com/PLSE-Lab/RascalGit.git</developerConnection>			
+    <developerConnection>scm:git:https://github.com/usethesource/rascal-git.git</developerConnection>			
     <tag>v0.1.0</tag>
   </scm>
 
