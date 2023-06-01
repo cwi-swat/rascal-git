@@ -18,8 +18,13 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.rascalmpl.exceptions.RuntimeExceptionFactory;
 
+import io.usethesource.vallang.IConstructor;
+import io.usethesource.vallang.IDateTime;
+import io.usethesource.vallang.IInteger;
 import io.usethesource.vallang.IList;
 import io.usethesource.vallang.IListWriter;
 import io.usethesource.vallang.ISourceLocation;
@@ -102,6 +107,23 @@ public class RascalGit {
                 throw RuntimeExceptionFactory.javaException(ioe, null, null);
             }    
         }
+    }
+
+    public IDateTime getTagCommitDate(ISourceLocation loc, IString tag) {
+        if (repoMap.containsKey(loc)) {
+            Repository repo = repoMap.get(loc);
+            try {
+                Ref r = repo.getRefDatabase().findRef(Constants.R_TAGS + tag.getValue());
+                RevWalk revWalk = new RevWalk(repo);
+                RevCommit commit = revWalk.parseCommit(r.getObjectId());
+                long instant = 1000L * commit.getCommitTime();
+                IDateTime commitTime = values.datetime(instant);
+                return commitTime;
+            } catch (IOException e) {
+                throw RuntimeExceptionFactory.javaException(e, null, null);
+            }
+        }
+        throw RuntimeExceptionFactory.illegalArgument(loc,"Repository not open");
     }
 	
 }
