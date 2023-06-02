@@ -4,12 +4,12 @@
 
   <groupId>edu.appstate.cs</groupId>
   <artifactId>rascal-git</artifactId>
-  <version>0.1.8-SNAPSHOT</version>
+  <version>0.1.8</version>
   <packaging>jar</packaging>
 
   <scm>
-      <developerConnection>scm:git:https://github.com/cwi-swat/rascal-git.git</developerConnection>			
-    <tag>HEAD</tag>
+    <developerConnection>scm:git:https://github.com/cwi-swat/rascal-git.git</developerConnection>			
+    <tag>v0.1.8</tag>
   </scm>
 
   <properties>
@@ -18,15 +18,15 @@
 
   <repositories>
     <repository>
-        <id>usethesource</id>
-        <url>https://releases.usethesource.io/maven/</url>
+      <id>usethesource</id>
+      <url>https://releases.usethesource.io/maven/</url>
     </repository>
   </repositories>
 
   <pluginRepositories>
     <pluginRepository>
-       <id>usethesource</id>
-       <url>https://releases.usethesource.io/maven/</url>
+      <id>usethesource</id>
+      <url>https://releases.usethesource.io/maven/</url>
     </pluginRepository>
   </pluginRepositories>
 
@@ -45,7 +45,7 @@
 
   <build>
     <resources>
-        <resource>
+      <resource>
         <directory>.</directory>
         <filtering>false</filtering>
         <includes>
@@ -72,8 +72,8 @@
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5.3</version>
         <configuration>
-            <tagNameFormat>v@{project.version}</tagNameFormat>
-            <arguments>-Drascal.compile.skip -DskipTests -Drascal.tutor.skip</arguments>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+          <arguments>-Drascal.compile.skip -DskipTests -Drascal.tutor.skip</arguments>
         </configuration>
     </plugin>
       <plugin>
@@ -90,18 +90,18 @@
         </configuration>
         <executions>
           <execution>
-              <id>rascal-compile</id>
-              <phase>compile</phase>
-              <goals>
-                  <goal>compile</goal>
-              </goals>
+            <id>rascal-compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
           </execution>
           <execution>
-              <id>rascal-package</id>
-              <phase>pre-package</phase>
-              <goals>
-                  <goal>package</goal>
-              </goals>
+            <id>rascal-package</id>
+            <phase>pre-package</phase>
+            <goals>
+              <goal>package</goal>
+            </goals>
           </execution>
         </executions>        
       </plugin>
