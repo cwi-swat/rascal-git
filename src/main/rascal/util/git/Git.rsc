@@ -34,9 +34,16 @@ module util::git::Git
     
 @javaClass{edu.appstate.cs.rascalgit.RascalGit}
 @synopsis{`git clone`}
+@description{
+This has the effect `git clone`, and it registers this repository
+with rascal-git for further processing.
+}
 java void cloneRemoteRepository(str remotePath, loc localPath);
 
 @javaClass{edu.appstate.cs.rascalgit.RascalGit}
+@description{
+This registers an existing clone with rascal-git for further processing.
+}
 java void openLocalRepository(loc localPath);
 
 @javaClass{edu.appstate.cs.rascalgit.RascalGit}
