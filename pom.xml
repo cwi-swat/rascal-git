@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.rascalmpl</groupId>
             <artifactId>rascal</artifactId>
-            <version>0.28.3</version>
+            <version>0.36.7</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
@@ -79,7 +79,7 @@
             <plugin>
                 <groupId>org.rascalmpl</groupId>
                 <artifactId>rascal-maven-plugin</artifactId>
-                <version>0.19.5</version>
+                <version>0.20.1</version>
                 <configuration>
                     <errorsAsWarnings>true</errorsAsWarnings>
                     <enableStandardLibrary>false</enableStandardLibrary>
