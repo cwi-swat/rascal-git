@@ -27,34 +27,22 @@ package edu.appstate.cs.rascalgit;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.jgit.api.CheckoutCommand;
+import io.usethesource.vallang.*;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
-import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.rascalmpl.exceptions.RuntimeExceptionFactory;
-
-import io.usethesource.vallang.IConstructor;
-import io.usethesource.vallang.IDateTime;
-import io.usethesource.vallang.IInteger;
-import io.usethesource.vallang.IList;
-import io.usethesource.vallang.IListWriter;
-import io.usethesource.vallang.ISourceLocation;
-import io.usethesource.vallang.IString;
-import io.usethesource.vallang.IValueFactory;
 
 public class RascalGit {
 	private final IValueFactory values;
@@ -149,6 +137,134 @@ public class RascalGit {
             }
         }
         throw RuntimeExceptionFactory.illegalArgument(loc,"Repository not open");
+    }
+
+    public void checkoutByDate(ISourceLocation loc, IDateTime refDate) {
+        if (repoMap.containsKey(loc)) {
+            File repoDir = new File(loc.getPath());
+            try {
+                Git git = Git.open(repoDir);
+                Repository repository = git.getRepository();
+                RevCommit targetCommit = null;
+                try (RevWalk walk = new RevWalk(repository)) {
+
+                    RevCommit head = walk.parseCommit(repository.resolve("HEAD"));
+                    walk.markStart(head);
+
+                    walk.sort(RevSort.COMMIT_TIME_DESC);
+
+                    for (RevCommit commit : walk) {
+
+                        long targetMillis = refDate.getInstant();
+                        long commitMillis = commit.getCommitTime() * 1000L;
+                        if (commitMillis <= targetMillis) {
+                            targetCommit = commit;
+                            break;
+                        }
+                    }
+                    if (targetCommit != null) {
+                        git.checkout()
+                                .setName(targetCommit.getId().getName())
+                                .call();
+                    }
+                }
+            } catch (GitAPIException ge) {
+                throw RuntimeExceptionFactory.javaException(ge, null, null);
+            } catch (IOException e) {
+                throw RuntimeExceptionFactory.javaException(e, null, null);
+            }
+        }
+    }
+
+    public void switchCommit(ISourceLocation loc, IString commitHash) {
+        if (repoMap.containsKey(loc)) {
+            Repository repo = repoMap.get(loc);
+            File repoDir = new File(loc.getPath());
+            String target = commitHash.getValue();
+            try {
+                Git git = Git.open(repoDir);
+                ObjectId id = repo.resolve(target);
+                if(id != null) {
+                    git.checkout().setName(target).call();
+                } else {
+                    throw RuntimeExceptionFactory.illegalArgument(loc, "Invalid hash reference");
+                }
+
+            } catch (GitAPIException ge) {
+                throw RuntimeExceptionFactory.javaException(ge, null, null);
+            } catch (IOException e) {
+                throw RuntimeExceptionFactory.javaException(e, null, null);
+            }
+        }
+    }
+
+    public void switchRef(ISourceLocation loc, IString refName) {
+        if (repoMap.containsKey(loc)) {
+            Repository repo = repoMap.get(loc);
+            File repoDir = new File(loc.getPath());
+            String target = refName.getValue();
+            try {
+                Git git = Git.open(repoDir);
+                String fullRefName = Constants.R_HEADS + refName;
+                ObjectId id = repo.resolve(fullRefName);
+                if(id != null) {
+                    git.checkout().setName(fullRefName).setStartPoint(fullRefName).call();
+                } else {
+                    throw RuntimeExceptionFactory.illegalArgument(loc, "Invalid ref reference");
+                }
+            } catch (GitAPIException ge) {
+                throw RuntimeExceptionFactory.javaException(ge, null, null);
+            } catch (IOException e) {
+                throw RuntimeExceptionFactory.javaException(e, null, null);
+            }
+        }
+    }
+
+    public IDateTime getCommitDate(ISourceLocation loc, IString commitHash) {
+        if (repoMap.containsKey(loc)) {
+            Repository repo = repoMap.get(loc);
+            try {
+                ObjectId id = repo.resolve(commitHash.getValue());
+                if (id == null) {
+                    throw RuntimeExceptionFactory.illegalArgument(loc, "Invalid ref reference");
+                }
+                RevWalk revWalk = new RevWalk(repo);
+                RevCommit commit = revWalk.parseCommit(repo.resolve(commitHash.getValue()));
+                long instant = 1000L * commit.getCommitTime();
+                IDateTime commitTime = values.datetime(instant);
+                return commitTime;
+            } catch (IOException e) {
+                throw RuntimeExceptionFactory.javaException(e, null, null);
+            }
+        }
+        throw RuntimeExceptionFactory.illegalArgument(loc,"Repository not open");
+    }
+
+    public IList getCommitLog(ISourceLocation loc, IBool reverse) {
+        if (repoMap.containsKey(loc)) {
+            Repository repo = repoMap.get(loc);
+            IListWriter listWriter = values.listWriter();
+            try {
+                RevWalk revWalk = new RevWalk(repo);
+                RevCommit commit = revWalk.parseCommit(repo.resolve("HEAD"));
+                revWalk.markStart(commit);
+                if (reverse.getValue()) {
+                    revWalk.sort(RevSort.REVERSE);
+                } else {
+                    revWalk.sort(RevSort.NONE);
+                }
+                for (RevCommit revCommit : revWalk) {
+                    String hash = revCommit.getId().getName();
+                    long commitMillis = revCommit.getCommitTime() * 1000L;
+
+                    ITuple commitTuple = values.tuple(values.string(hash), values.datetime(commitMillis));
+                    listWriter.append(commitTuple);
+                }
+                return listWriter.done();
+            } catch (IOException e) {
+                throw RuntimeExceptionFactory.javaException(e, null, null);
+            }
+        } throw RuntimeExceptionFactory.illegalArgument(loc,"Repository not open");
     }
 	
 }

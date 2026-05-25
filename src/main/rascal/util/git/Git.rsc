@@ -57,3 +57,29 @@ java void switchToTag(loc repoPath, str \tag);
 @javaClass{edu.appstate.cs.rascalgit.RascalGit}
 @synopsis{`git log -1 --format=%ai myTagName`}
 java datetime getTagCommitDate(loc repoPath, str \tag);
+
+@javaClass{edu.appstate.cs.rascalgit.RascalGit}
+@synopsis{`git checkout `git rev-list -n 1 --before="2023-01-01 12:00:00" HEAD``}
+@description{
+This will checkout the most recent commit before the given date.
+}
+java void checkoutByDate(loc repoPath, datetime refDate);
+
+@javaClass{edu.appstate.cs.rascalgit.RascalGit}
+@synopsis{`git checkout myfeaturebranch`}
+java void switchRef(loc repoPath, str refName);
+
+@javaClass{edu.appstate.cs.rascalgit.RascalGit}
+@synopsis{`git checkout commmithash`}
+java void switchCommit(loc repoPath, str commitHash);
+
+@javaClass{edu.appstate.cs.rascalgit.RascalGit}
+@synopsis{`git show -s --format=%cI commithash`}
+java datetime getCommitDate(loc repoPath, str commitHash);
+
+@javaClass{edu.appstate.cs.rascalgit.RascalGit}
+@synopsis{`git log [--reverse] --format="%H,%ct"`}
+@description{
+This will return a list of tuples of the commit hash and the commit date.
+}
+public java list[tuple[str hash, datetime date]] getCommitLog(loc repoPath, bool reverse);
